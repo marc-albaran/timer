@@ -6,27 +6,43 @@
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
 	<script type="module" src="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-1a/pXj49ZQ1aHEmrJ+gMw1otqoVsYwlEnlD8mIfY2TV03r20Y0CN7uqx1tQogjPL" crossorigin="anonymous"></script>
 	<title>Timer</title>
+  <style>
+    .bg-orange{
+      background-color: #fd7e14;
+    }
+  </style>
 </head>
 <body>
-	<div class="container">
-		<div class="row justify-content-center align-items-center" style="height: 100vh;">
-			<div class="col text-center">
-				<h1>Presentation</h1>
-				<div class="text-center fs-6xl fw-bold" id="timer-presentation">20:00</div>
-				<div class="mt-12">
-					<button class="btn btn-md btn-solid btn-styled theme-success w-7" onclick="presentation.start()">Start</button>
-					<button class="btn btn-md btn-solid theme-warning d-inline-block mx-10 w-7" onclick="presentation.pause()">Pause</button>
-					<button class="btn btn-md btn-outline theme-danger w-7" onclick="presentation.reset()">Reset</button>
-				</div>		
+	<div class="container-fluid">
+		<div class="row justify-content-around align-items-center" style="height: 100dvh;">
+			<div class="col-5 text-center">
+        <div class="card text-center">
+          <div class="card-header">
+            <h2>PRESENTATION</h2>
+          </div>
+          <div class="card-body py-12" id="display-presentation">
+            <div class="text-center fs-6xl fw-bold" id="timer-presentation">20:00</div>
+          </div>
+          <div class="card-footer py-5">
+            <button class="btn btn-md btn-solid btn-styled theme-success w-7" onclick="presentation.start()">Start</button>
+            <button class="btn btn-md btn-solid theme-warning d-inline-block mx-10 w-7" onclick="presentation.pause()">Pause</button>
+            <button class="btn btn-md btn-outline theme-danger w-7" onclick="presentation.reset()">Reset</button>
+          </div>
+        </div>	
 			</div>
-			<div class="col text-center">
-				<h1>Q & A</h1>
-				<div class="text-center fs-6xl fw-bold" id="timer-q-and-a">10:00</div>
-				<div class="mt-12">
-					<button class="btn btn-md btn-solid btn-styled theme-success w-7" onclick="qanda.start()">Start</button>
-					<button class="btn btn-md btn-solid theme-warning d-inline-block mx-10 w-7" onclick="qanda.pause()">Pause</button>
-					<button class="btn btn-md btn-outline theme-danger w-7" onclick="qanda.reset()">Reset</button>
-				</div>			
+			<div class="col-5 text-center">
+        <div class="card text-center">
+          <div class="card-header">
+            <h2>Q & A</h2>
+          </div>
+          <div class="card-body py-12" id="display-q-and-a">
+            <div class="text-center fs-6xl fw-bold" id="timer-q-and-a">10:00</div>
+          </div>
+          <div class="card-footer py-5">
+            <button class="btn btn-md btn-solid btn-styled theme-success w-7" onclick="qanda.start()">Start</button>
+            <button class="btn btn-md btn-solid theme-warning d-inline-block mx-10 w-7" onclick="qanda.pause()">Pause</button>
+            <button class="btn btn-md btn-outline theme-danger w-7" onclick="qanda.reset()">Reset</button>
+        </div>			
 			</div>
 		</div>
 	</div>
@@ -36,11 +52,14 @@
 
 <script>
     class EventTimer {
-      constructor(durationInMinutes, displayElementId, onCompleteCallback) {
+      constructor(durationInMinutes, displayElementId, bgId, rule) {
+      // constructor(durationInMinutes, displayElementId, rule, onCompleteCallback) {
         this.initialSeconds = durationInMinutes * 60;
         this.remainingSeconds = this.initialSeconds;
         this.displayElement = document.getElementById(displayElementId);
-        this.onComplete = onCompleteCallback;
+        this.bgElement = document.getElementById(bgId);
+        this.ColorAlerts = rule; // Flag to toggle color rules
+        //this.onComplete = onCompleteCallback;
         this.intervalId = null;
 
         this.updateDisplay();
@@ -69,7 +88,38 @@
       reset() {
         this.pause();
         this.remainingSeconds = this.initialSeconds;
+        this.bgElement.classList.remove("bg-warning", "bg-orange", "bg-danger");
+        this.displayElement.classList.remove("fg-black");
         this.updateDisplay();
+      }
+
+      updateColor() {
+        switch (this.ColorAlerts) {
+          case 'presentation':
+            if (this.remainingSeconds === 0) {
+              this.bgElement.classList.replace("bg-orange","bg-danger");
+              // this.bgElement.style.backgroundColor = '#ffcccc'; // Soft Red (Done)
+            } else if (this.remainingSeconds <= 5 * 60) {
+              // this.bgElement.style.backgroundColor = '#ffd699'; // Soft Orange (<= 5 mins)
+              this.bgElement.classList.replace("bg-warning","bg-orange");
+            } else if (this.remainingSeconds <= 10 * 60) {
+              // this.bgElement.style.backgroundColor = '#fff59d'; // Soft Yellow (<= 10 mins)
+              this.bgElement.classList.add("bg-warning");
+              this.displayElement.classList.add("fg-black");
+            } 
+            break;
+          case 'qanda':
+            if (this.remainingSeconds === 0) {
+              // this.bgElement.style.backgroundColor = '#ffcccc'; // Soft Red (Done)
+              this.bgElement.classList.replace("bg-warning","bg-danger");
+            } else if (this.remainingSeconds <= 5 * 60) {
+              // this.bgElement.style.backgroundColor = '#ffd699'; // Soft Orange (<= 5 mins)
+              this.bgElement.classList.add("bg-warning");
+              this.displayElement.classList.add("fg-black");
+            } 
+            break;
+        }
+
       }
 
       updateDisplay() {
@@ -79,20 +129,20 @@
         // Pad numbers with a leading zero (e.g., 09:05)
         const formattedMinutes = String(minutes).padStart(2, '0');
         const formattedSeconds = String(seconds).padStart(2, '0');
-        
         this.displayElement.textContent = `${formattedMinutes}:${formattedSeconds}`;
+        this.updateColor();
       }
     }
 
     // Initialize Event 1 (20 minutes)
-    const presentation = new EventTimer(20, 'timer-presentation', () => {
-      alert('Presentation has finished!');
-    });
+    const presentation = new EventTimer(20, 'timer-presentation', 'display-presentation','presentation');
 
     // Initialize Event 2 (10 minutes)
-    const qanda = new EventTimer(10, 'timer-q-and-a', () => {
+    const qanda = new EventTimer(10, 'timer-q-and-a', 'display-q-and-a', 'qanda');
+
+    /*const qanda = new EventTimer(10, 'timer-q-and-a', 'qanda',() => {
       alert('Q & A has finished!');
-    });
+    });*/
   </script>
 
 </body>
