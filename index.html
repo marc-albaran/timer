@@ -96,13 +96,10 @@
       updateColor() {
         switch (this.ColorAlerts) {
           case 'presentation':
-            if (this.remainingSeconds === 0) {
-              this.bgElement.classList.replace("bg-orange","bg-danger");
-              // this.bgElement.style.backgroundColor = '#ffcccc'; // Soft Red (Done)
-            } else if (this.remainingSeconds <= 5 * 60) {
+			if (this.remainingSeconds <= 1 * 60) {
               // this.bgElement.style.backgroundColor = '#ffd699'; // Soft Orange (<= 5 mins)
-              this.bgElement.classList.replace("bg-warning","bg-orange");
-            } else if (this.remainingSeconds <= 10 * 60) {
+              this.bgElement.classList.replace("bg-warning","bg-danger");
+            } else if (this.remainingSeconds <= 5 * 60) {
               // this.bgElement.style.backgroundColor = '#fff59d'; // Soft Yellow (<= 10 mins)
               this.bgElement.classList.add("bg-warning");
               this.displayElement.classList.add("fg-black");
@@ -112,7 +109,7 @@
             if (this.remainingSeconds === 0) {
               // this.bgElement.style.backgroundColor = '#ffcccc'; // Soft Red (Done)
               this.bgElement.classList.replace("bg-warning","bg-danger");
-            } else if (this.remainingSeconds <= 5 * 60) {
+            } else if (this.remainingSeconds <= 1 * 60) {
               // this.bgElement.style.backgroundColor = '#ffd699'; // Soft Orange (<= 5 mins)
               this.bgElement.classList.add("bg-warning");
               this.displayElement.classList.add("fg-black");
@@ -138,7 +135,7 @@
     const presentation = new EventTimer(20, 'timer-presentation', 'display-presentation','presentation');
 
     // Initialize Event 2 (10 minutes)
-    const qanda = new EventTimer(10, 'timer-q-and-a', 'display-q-and-a', 'qanda');
+    const qanda = new EventTimer(5, 'timer-q-and-a', 'display-q-and-a', 'qanda');
 
     /*const qanda = new EventTimer(10, 'timer-q-and-a', 'qanda',() => {
       alert('Q & A has finished!');
